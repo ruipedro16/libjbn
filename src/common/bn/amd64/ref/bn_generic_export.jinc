@@ -16,6 +16,8 @@ export fn bn_eq(reg ptr u64[NLIMBS] a b) -> reg u64
 {
   reg u64 r;
 
+  _ = #init_msf();
+
   r = _bn_eq_(a, b);
   
   return r;
@@ -25,14 +27,16 @@ export fn bn_test0(reg ptr u64[NLIMBS] a) -> reg u64
 {
   reg u64 r;
   
+  _ = #init_msf();
+
   r = __bn_test0(a);
-  r = r; // avoid extra assignment warning
   
   return r;
 }
 
 export fn bn_copy(reg ptr u64[NLIMBS] r a) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
   r = #copy(a);
   return r;
 }
@@ -40,6 +44,8 @@ export fn bn_copy(reg ptr u64[NLIMBS] r a) -> reg ptr u64[NLIMBS]
 export fn bn_set0(reg ptr u64[NLIMBS] r) -> reg ptr u64[NLIMBS]
 {
   inline int i;
+
+  _ = #init_msf();
 
   for i = 0 to NLIMBS {
     r[i] = 0;
@@ -50,6 +56,7 @@ export fn bn_set0(reg ptr u64[NLIMBS] r) -> reg ptr u64[NLIMBS]
 
 export fn bn_addn(reg ptr u64[NLIMBS] r a b) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
   r = #copy(a);
   _, r = __bn_addc(r, b);
   return r;
@@ -57,6 +64,7 @@ export fn bn_addn(reg ptr u64[NLIMBS] r a b) -> reg ptr u64[NLIMBS]
 
 export fn bn_subn(reg ptr u64[NLIMBS] r a b) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
   r = #copy(a);
  _, r = __bn_subc(r, b);
   return r;
@@ -67,6 +75,7 @@ export fn bn_muln(
   reg ptr u64[NLIMBS] a b
 ) -> reg ptr u64[2*NLIMBS]
 {
+  _ = #init_msf();
   b = b;
   r = __bn_muln(a, b, r);
   return r;
@@ -77,6 +86,7 @@ export fn bn_sqrn(
   reg ptr u64[NLIMBS] a
 ) -> reg ptr u64[2*NLIMBS]
 {
+  _ = #init_msf();
   r = __bn_sqrn(a, r);
   return r;
 }
