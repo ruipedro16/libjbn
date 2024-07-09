@@ -8,55 +8,80 @@ from Libjbn require "common/bn/amd64/ref/bn_generic_export.jinc"
 
 export fn fp_add(reg ptr u64[NLIMBS] r a b) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
+
   r = #copy(a);
   r = _fp_add(r, b);
+  
   return r;
 }
 
 
 export fn fp_sub(reg ptr u64[NLIMBS] r a b) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
+
   r = #copy(a);
   r = _fp_sub(r, b);
+  
   return r;
 }
 
 export fn fp_mul(reg ptr u64[NLIMBS] r a b) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
+
   b = b;
   r = _fp_mul(a, b, r);
+
   return r;
 }
 
 export fn fp_sqr(reg ptr u64[NLIMBS] r a) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
+
   r = _fp_sqr(a, r);
+  
   return r;  
 }
 
 export fn fp_expm_noct(reg ptr u64[NLIMBS] r a b) -> reg ptr u64[NLIMBS]
 {
-  r = _fp_exp(a, b, r);
+  #msf reg u64 ms; 
+
+  ms = #init_msf();
+  r = _fp_exp(a, b, r, ms);
+
   return r;
 }
 
 export fn fp_inv(reg ptr u64[NLIMBS] r a) -> reg ptr u64[NLIMBS]
 {
-  r = __fp_inv(a, r);
+  #msf reg u64 ms;
+
+  ms = #init_msf();
+  r = __fp_inv(a, r, ms);
+
   return r;
 }
 
 export fn fp_toM(reg ptr u64[NLIMBS] r a) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
+
   r = #copy(a);
   r = _fp_toM(r);
+  
   return r;
 }
 
 export fn fp_fromM(reg ptr u64[NLIMBS] r a) -> reg ptr u64[NLIMBS]
 {
+  _ = #init_msf();
+  
   r = #copy(a);
   r = _fp_fromM(r);
+  
   return r;
 }
-

@@ -239,18 +239,21 @@ fn _fp_sqrU // update inplace
   obs: naive square-multiply algorithm. Not Constant-Time!!!
   (good enough for use with public exponents, such as in inversion) */
 #[returnaddress="stack"]
-fn _fp_exp
-( reg ptr u64[NLIMBS] a _b r
+fn _fp_exp(
+  reg ptr u64[NLIMBS] a _b,
+  #spill_to_mmx reg ptr u64[NLIMBS] r,
+  #msf reg u64 ms
 ) -> reg ptr u64[NLIMBS] {
   inline int j;
-  reg u64 k t;
+  #spill_to_mmx reg u64 k;
+  reg u64 t;
   reg bool cf;
   stack u64[NLIMBS] _x;
   reg ptr u64[NLIMBS] x;
-  stack u64 ss;
-  stack ptr u64[NLIMBS] rr bb;
+  stack ptr u64[NLIMBS] bb;
   reg ptr u64[NLIMBS] b;
   reg ptr u64[NLIMBS] glob_oneMp;
+  reg bool cond;
 
   x = _x;
   glob_oneMp = glob_oneM;
@@ -261,40 +264,61 @@ fn _fp_exp
   _x = x;
 
   bb = _b;
-  rr = r;
+  () = #spill(r);
+
   for j = 0 to NLIMBS {
     b = bb;
+    b = #protect_ptr(b, ms);
+
     t = b[(int) j];
+    t = #protect(t, ms);
+    
     k = 64;
-    while (k != 0) {
-      ss = k;
+    while { cond = (k != 0); } (cond) {
+      ms = #update_msf(cond, ms);
+
+      () = #spill(k);
+
       _, cf, _, _, _, t = #SHR(t, 1);
+      
       if (cf) {
-        r = rr;
+        ms = #update_msf(cf, ms);
+
+        () = #unspill(r);
+
         x = _x; //w
+
         r = _fp_mulU(r, x);
         _x = x; //w
-        rr = r;
+        () = #spill(r);
+      } else {
+        ms = #update_msf(!cf, ms);
       }
+
       x = _x; //w
       x = _fp_sqrU(x);
       _x = x; //w
-      k = ss;
+      
+      () = #unspill(k);
       k -= 1;
     }
+
+    ms = #update_msf(!cond, ms);
   }
-  r=rr;
+  
+  () = #unspill(r);
+
   return r;
 }
 
 // ////////////////////////////////////
 
 /* Modular Inversion */
-inline fn __fp_inv( reg ptr u64[NLIMBS] a r ) -> reg ptr u64[NLIMBS] {
+inline fn __fp_inv( reg ptr u64[NLIMBS] a r, #msf reg u64 ms ) -> reg ptr u64[NLIMBS] {
   /* a^{p-2} */
   reg ptr u64[NLIMBS] glob_pm2p;
   glob_pm2p = glob_pm2;
-  r = _fp_exp(a, glob_pm2p, r);
+  r = _fp_exp(a, glob_pm2p, r, ms);
   return r;
 }
 
