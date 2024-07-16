@@ -366,8 +366,6 @@ inline fn __bn_muln
   inline int k;
   reg u64 t0 t1;
   reg u64[3] x;
-  reg bool cf;
-
 
   t0 = a[0];
   t1, t0 = t0 * b[0];
